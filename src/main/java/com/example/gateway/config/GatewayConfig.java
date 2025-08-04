@@ -21,7 +21,7 @@ public class GatewayConfig {
     public RouterFunction<ServerResponse> getRoute() {
         return route().GET("/get", http())
                 .before(compositeFilter.extractOrCreateRequestId())
-                .filter(compositeFilter.addRequestId())
+                .before(compositeFilter.addRequestId())
                 .before(uri("http://httpbin.org:80"))
                 .build();
     }
