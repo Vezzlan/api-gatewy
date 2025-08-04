@@ -32,7 +32,7 @@ public class RequestIdFilter {
         DefaultRequestInspector headerInspector = new DefaultRequestInspector(
                 HttpServletRequest::getHeader,
                 "X-Request-ID",
-                requestId -> {}
+                this::updateRequestHeader
         );
 
         DefaultRequestInspector parameterInspector = new DefaultRequestInspector(

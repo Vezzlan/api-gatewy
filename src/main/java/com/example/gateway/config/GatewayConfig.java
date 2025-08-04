@@ -1,6 +1,5 @@
 package com.example.gateway.config;
 
-import com.example.gateway.inspector.RequestIdFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.function.*;
@@ -21,7 +20,8 @@ public class GatewayConfig {
     @Bean
     public RouterFunction<ServerResponse> getRoute() {
         return route().GET("/get", http())
-                .filter(compositeFilter.extractRequestId())
+                .before(compositeFilter.extractOrCreateRequestId())
+                .filter(compositeFilter.addRequestId())
                 .before(uri("http://httpbin.org:80"))
                 .build();
     }

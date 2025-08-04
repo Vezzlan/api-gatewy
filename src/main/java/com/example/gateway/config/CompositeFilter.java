@@ -7,6 +7,8 @@ import org.springframework.web.servlet.function.HandlerFilterFunction;
 import org.springframework.web.servlet.function.ServerRequest;
 import org.springframework.web.servlet.function.ServerResponse;
 
+import java.util.function.Function;
+
 @Component
 public class CompositeFilter {
 
@@ -16,9 +18,15 @@ public class CompositeFilter {
         this.idFilter = idFilter;
     }
 
-    public  HandlerFilterFunction<ServerResponse, ServerResponse> extractRequestId() {
-        return (request, next) -> {
+    public  Function<ServerRequest, ServerRequest> extractOrCreateRequestId() {
+        return request -> {
             idFilter.getOrCreate(request.servletRequest());
+            return request;
+        };
+    }
+
+    public  HandlerFilterFunction<ServerResponse, ServerResponse> addRequestId() {
+        return (request, next) -> {
             final var requestId = RequestContext.get();
             ServerRequest modified = generateRequest(request, requestId);
             ServerResponse response = next.handle(modified);
