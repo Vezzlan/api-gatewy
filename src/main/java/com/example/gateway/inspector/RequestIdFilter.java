@@ -19,13 +19,21 @@ public class RequestIdFilter {
 
     private final ObjectMapper objectMapper;
 
-    public RequestIdFilter() {
-        this.objectMapper = new ObjectMapper();
+    public RequestIdFilter(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
         this.inspectorChain = buildInspectorChain();
         this.defaultRequestProcessor = new DefaultRequestProcessor(
                 () -> UUID.randomUUID().toString(),
                 this::updateRequestHeader
         );
+    }
+
+    public void getOrCreate(HttpServletRequest request) {
+        RequestProcessor processor = inspectorChain
+                .getProcessor(request)
+                .orElse(defaultRequestProcessor);
+
+        processor.execute();
     }
 
     private RequestInspector buildInspectorChain() {
@@ -52,10 +60,6 @@ public class RequestIdFilter {
                 .orElse(bodyInspector);
     }
 
-    private void updateRequestHeader(String requestId) {
-        RequestContext.set(requestId);
-    }
-
     private String getBodyAttribute(HttpServletRequest request, String name) {
         try (var inputStream = request.getInputStream()) {
             var rootNode = objectMapper.readTree(inputStream);
@@ -68,12 +72,8 @@ public class RequestIdFilter {
         }
     }
 
-    public void getOrCreate(HttpServletRequest request) {
-        RequestProcessor processor = inspectorChain
-                .getProcessor(request)
-                .orElse(defaultRequestProcessor);
-
-        processor.execute();
+    private void updateRequestHeader(String requestId) {
+        RequestContext.set(requestId);
     }
 
 }
