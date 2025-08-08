@@ -5,4 +5,10 @@ so I decided to try creating my own project with a similar setup.
 Since the author seems to have used Zuul filters, which appear 
 to be deprecated, I chose to use Spring API Gateway MVC instead.
 
+### Design patterns
+
+Chain of Responsibility is often used in conjunction with Composite which is also used in this case.
+https://refactoring.guru/design-patterns/chain-of-responsibility
+
+
 Requires Java 21 and Maven.
