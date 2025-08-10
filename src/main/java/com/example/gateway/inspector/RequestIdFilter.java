@@ -1,6 +1,7 @@
 package com.example.gateway.inspector;
 
 import com.example.gateway.context.RequestContext;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
@@ -8,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.Optional;
 import java.util.UUID;
 
 @Component
@@ -66,7 +68,9 @@ public class RequestIdFilter {
         try (var inputStream = request.getInputStream()) {
             final var rootNode = objectMapper.readTree(inputStream);
 
-            return rootNode != null ? rootNode.asText() : "";
+            return Optional.ofNullable(rootNode.get(name))
+                    .map(JsonNode::asText)
+                    .orElse("");
         } catch (IOException e) {
             log.error("Failed to read json");
             throw new RuntimeException();
