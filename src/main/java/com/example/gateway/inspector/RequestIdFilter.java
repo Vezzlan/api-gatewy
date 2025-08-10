@@ -8,7 +8,7 @@ import java.util.UUID;
 @Component
 public class RequestIdFilter {
 
-    private final RequestInspector inspectorChain;
+    private final RequestInspector requestInspector;
 
     private final DefaultRequestProcessor defaultRequestProcessor;
 
@@ -16,7 +16,7 @@ public class RequestIdFilter {
 
     public RequestIdFilter(BodyInspector bodyInspector) {
         this.bodyInspector = bodyInspector;
-        this.inspectorChain = buildInspectorChain();
+        this.requestInspector = buildInspectorChain();
         this.defaultRequestProcessor = new DefaultRequestProcessor(
                 () -> UUID.randomUUID().toString(),
                 this::updateRequestHeader
@@ -24,7 +24,7 @@ public class RequestIdFilter {
     }
 
     public void getOrCreate(HttpServletRequest request) {
-        RequestProcessor processor = inspectorChain
+        RequestProcessor processor = requestInspector
                 .getProcessor(request)
                 .orElse(defaultRequestProcessor);
 
